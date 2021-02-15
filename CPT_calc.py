@@ -31,24 +31,54 @@ class HMM_fish:
 
     def filtering(self, num_t):
 
-        if num_t > self.observations:
+        if num_t > len(self.observations):
             return print("Not enough evidence!")
 
         X_t = np.array([]) # the (binary) prob. distribution at time t, list
 
-        T = np.array([self.prob_depen_fish, 
-                    self.prob_depen_fish.reverse()])
+        T_first_row = self.prob_depen_fish.copy()
+        T_second_row = self.prob_depen_fish.copy()
+        T_second_row.reverse()
+        T_list = [T_first_row, T_second_row]
+
+        T = np.array(T_list)
+        #print(T)
+
+        obs_true_list = [[self.prob_depen_birds[0], 0], [0, self.prob_depen_birds[1]]]
+        obs_false_list = [[1-self.prob_depen_birds[0], 0], [0, 1-self.prob_depen_birds[1]]]
+        O_true = np.array(obs_true_list)
+        O_false = np.array(obs_false_list)
+        #print(O_true)
+
+        vector = self.starting_prob_fish
+
+        for t in range(num_t):
+            vector = np.matmul(vector, T)
+            if self.observations[t] == 1:
+                vector = np.matmul(vector, O_true)
+            elif self.observations[t] == 0:
+                vector = np.matmul(vector, O_false)
+            else:
+                return print('Feil input i observasjoner')
+
+        vector = self.normalize(vector)
+
+        return vector
+
+
+def umbrella_ex():
+
+    HMM_umbrella = HMM_fish([0.5, 0.5], [0.7, 0.3], [0.9, 0.2], [1, 1])
+    result = HMM_umbrella.filtering(2)
+
+    return result
+
 
 def main():
 
-    A = np.array([[1,0],
-                [0,1]])
-    B = np.array([[2,2],
-                [2,2]])
-
-    return np.matmul(A, B)
+    return None
 
 
-if __name__ == main():
-    main()
+if __name__ == '__main__':
+    print(main())
 
