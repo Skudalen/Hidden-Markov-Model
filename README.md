@@ -1,3 +1,3 @@
 # Hidden-Markov-Model
 
-Simple prosject storage.
+Simple HMM project.
